@@ -1,28 +1,66 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <b-container>
+    <b-form-textarea
+      id="textarea"
+      v-model="text"
+      placeholder="Text"
+      rows="6"
+      class="mt-1"
+    ></b-form-textarea>
+    <b-form-input class="mt-1" v-model="original_words" placeholder="Original words"></b-form-input>
+    <div>
+      <b-button class="m-1" :disabled="isDisabled" variant="primary" v-on:click="encode">Encode</b-button>
+      <b-button class="m-1" :disabled="!isDisabled" variant="primary" v-on:click="decode">Decode</b-button>
+    </div>
+  </b-container>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import axios from 'axios';
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
+  data() {
+      return {
+        original_words: '',
+        text: '',
+        baseURI: 'http://0.0.0.0:5000',
+      }
+    },
+  computed: {
+      isDisabled() {
+        return this.original_words.length > 0
+      },
+    },
+  methods: {
+      encode: function () {
+        const request = { text: this.text };
+        axios.post(this.baseURI + "/v1/encode", request)
+          .then(response => {
+            this.text = response.data.encoded_text;
+            this.original_words = response.data.original_words.join(', ');
+          }
+        );
+      },
+      decode: function () {
+        const request = { 
+          text: this.text, 
+          original_words: this.original_words.split(', ')
+          };
+        axios.post(this.baseURI + "/v1/decode", request)
+          .then(response => {
+            this.text = response.data.decoded_text;
+            this.original_words = "";
+          }
+        );
+      },
+    },
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+#textarea {
+  top: 50px;
 }
 </style>
