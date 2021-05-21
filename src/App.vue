@@ -25,7 +25,7 @@ export default {
       return {
         original_words: '',
         text: '',
-        baseURI: 'http://0.0.0.0:5000',
+        baseURI: 'https://weirdtext-backend.herokuapp.com',
       }
     },
   computed: {
